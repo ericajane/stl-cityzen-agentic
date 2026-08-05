@@ -1,0 +1,19 @@
+# Never let build context include real secrets or huge local data — none of
+# this should ever end up baked into an image layer.
+.env
+.env.agent
+data/
+
+# Host node_modules is Mac-built and shouldn't leak into the build context
+# either (we rebuild it fresh inside the image instead).
+node_modules
+
+# Build/test output and caches — regenerated inside the container as needed.
+dist
+tmp
+.nx/cache
+.nx/workspace-data
+.angular/cache
+coverage
+
+.git

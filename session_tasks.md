@@ -19,3 +19,5 @@ Files or folders the agent may write to: apps/backend
 Files or folders the agent may read but not write to: apps/frontend
 Commands the agent may run: creating new files, running unit tests
 Definition of done: Report is produced and contains the correct information.
+
+
