@@ -1,35 +1,28 @@
-This workflow reviews a repository’s Docker setup by running the documented build command, reporting the outcome, and recommending whether the repo is ready to proceed.
+This workflow reviews a repository’s front end unit tests by running the documented test command, reporting the code coverage percentage for each component, and recommending areas to increase code coverage.
 
 Trigger: A developer invokes claude "[task prompt]" from the repo root.
 
-Decision Events: If the Docker build succeeds, the agent summarizes any warnings and recommends
-proceeding.
+Decision Events: If all tests are passing, the agent produces a code coverage report.
 
-If the Docker build fails, the agent reports the error output and recommends
-against proceeding. It does not attempt a fix.
+If there are failing unit tests, it reports each failing test and directs the developer to fix them before invoking this task again. It does not attempt a fix.
 
 Actions:
-1. Read the repository’s documentation to identify the documented Docker build
-command.
+1. Read the repository’s documentation to identify the documented command to run unit tests.
 
-2. Run the Docker build command inside the sandbox.
+2. Run the front end unit test suite inside the sandbox.
 
-3. Capture the output from the build process.
+3. Capture the code coverage percentage for each component.
 
-4. Evaluate the build result (success or failure).
+4. Capture the code coverage percentage for the front end as a whole.
 
-5. Summarize any warnings or errors present in the output.
-
-6. Produce a final recommendation, ready to proceed or not ready, with a brief
-rationale.
+5. Produce recommendations to improve code coverage.
 
 Acceptance Criteria:
-1. The agent correctly identifies whether the Docker image was built successfully or failed.
+1. The agent correctly identifies the code coverage percentage for all components.
 
-2. The summary includes all warnings and errors present in the build output; it
-does not omit any.
+2. The agent correctly identifies the code coverage percentage for the front end as a whole.
 
-3. The recommendation is consistent with the build result.
+3. The recommendations for coverage improvement are consistent with unit testing best practices.
 
 4. The agent did not push, publish, or deploy anything.
 
