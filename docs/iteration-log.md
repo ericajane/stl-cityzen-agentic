@@ -53,7 +53,7 @@ Measurements:
 
 - Review latency: 19 minutes
 
-- Cost per run: $[0.56] (6.0k in / 4.9k out)
+- Cost per run: $0.56 (6.0k in / 4.9k out)
 
 
 Pass/Fail: Pass
@@ -112,31 +112,31 @@ Rubric Scores:
 
 |-------------------|-------------|--------------------------------|
 
-| Process Discipline & Scope Adherence     | [Score]     | [Brief observation]            |
+| Process Discipline & Scope Adherence     | 4     | It didn't do anything it wasn't supposed to do, and this time, even reassured me with an occasional "per your instructions". Report generated and saved at repo root.            |
 
-| Test Coverage Report Accuracy     | [Score]     | [Brief observation]            |
+| Test Coverage Report Accuracy     | 4     | The percentages reported were correct and match the test runner output.            |
 
-| Coverage Improvement Recommendation Quality     | [Score]     | [Brief observation]            |
+| Coverage Improvement Recommendation Quality     | 4     | I did get a specific code line reference this time, and it again did a good job recognizing boilerplate-y functions that we don't need to test.            |
 
-| Total         | [X / Y]     | Pass threshold: per dimension (see rubric)   |
+| Total         | 12 / 12     | Pass threshold: per dimension (see rubric)   |
 
 Measurements:
 
-- Cycle time: [X minutes Y seconds]
+- Cycle time: [2 minutes 12 seconds]
 
-- Review latency: [X minutes]
+- Review latency: [6 minutes]
 
-- Cost per run: $[X.XX] ([input tokens] in / [output tokens] out)
-
-
-Pass/Fail: [Pass / Fail]
+- Cost per run: $0.51 (5.9k in / 5.8k out)
 
 
-Observations: [What happened during the run? What did the agent do well?
+Pass/Fail: Pass
 
-Where did it fall short? Anything surprising about the output or the process?
 
-Two to five sentences is enough.]
+Observations: 
+
+What it did well: This time, even though I didn't instruct it do, the report DID mention a specific line of code. Also, instructing the agent to save the report to an .md file makes the report SO much easier to read and evaluate for accuracy, and this likely played a role in reducing the review time from 19 minutes to 6 minutes. 
+
+Where it fell short: Still only 1 specific code reference, but that can be fixed with further iteration.
 
 
 Changes made: Added a last step to the workflow (Step 7) to save the report as an .md file.
