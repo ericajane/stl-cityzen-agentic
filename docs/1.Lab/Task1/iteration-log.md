@@ -141,7 +141,7 @@ Where it fell short: Still only 1 specific code reference, but that can be fixed
 
 Changes made: Added a last step to the workflow (Step 7) to save the report as an .md file.
 
-## Run 003 -- 8-18-2026 
+## Run 003 -- 8-20-2026 
 
 Task: Produce a unit test code coverage report for the front end.
 
@@ -184,21 +184,21 @@ Rubric Scores:
 
 |-------------------|-------------|--------------------------------|
 
-| Process Discipline & Scope Adherence     | []     | []            |
+| Process Discipline & Scope Adherence     | 4     | Everything was as expected. Again, I have not yet intentionally broken a test to see how that is handled, but perhaps in a future run.            |
 
-| Test Coverage Report Accuracy     | []     | []            |
+| Test Coverage Report Accuracy     | 4     | All coverage percentages reflected those in the test runner, and were correctly labeled.            |
 
-| Coverage Improvement Recommendation Quality     | 4     | I did get a specific code line reference this time, and it again did a good job recognizing boilerplate-y functions that we don't need to test.            |
+| Coverage Improvement Recommendation Quality     | 3     | Identified the most pressing coverage gaps and gave specific lines of code. However, with this run, the agent recommended that I test boilerplate code that it, until now, has recommended I not test.          |
 
-| Total         | 12 / 12     | Pass threshold: per dimension (see rubric)   |
+| Total         | 11 / 12     | Pass threshold: per dimension (see rubric)   |
 
 Measurements:
 
-- Cycle time: 2 minutes 12 seconds
+- Cycle time: 6 minutes 45 seconds
 
-- Review latency: 6 minutes
+- Review latency: 5 minutes
 
-- Cost per run: $0.51 (5.9k in / 5.8k out)
+- Cost per run: $0.77 (5.7k in / 12.5k out)
 
 
 Pass/Fail: Pass
@@ -206,11 +206,17 @@ Pass/Fail: Pass
 
 Observations: 
 
-What it did well:  
+What it did well: This was a good run and got into much more detail this time, referring to specific lines of code, and even providing snippets of test code.
 
-Where it fell short: 
+Where it fell short: The only downfall was recommending I test a boilerplate function in the app.ts file to increase coverage (though it did correctly note that this is very low-impact/low-priority.). 
 
 
 Changes made: The only change made between Run 002 (last run from previous exercise) and Run 003 was an instruction to save the report file at the apps/frontend level as opposed to the repo level, as the other agent will be handling the backend report and it made sense that the reports should live in the appropriate places.
 
+Changelog from merge: 
+8e26d8f (HEAD -> main, feature/task-1) frontend coverage report generated
+8b111aa (origin/main, origin/feature/task-2, origin/feature/task-1, origin/HEAD, feature/task-2) deleted old file
+709e608 Preparing for Module 1 Lab
+91c0612 frontend test report generated - Run 002
+ae7db10 preparing for run 2
 
