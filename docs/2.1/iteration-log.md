@@ -1,80 +1,4 @@
-## Run 001 -- 8-29-2026 -- Baseline
-
-Full Prompt: 
-
-You are a front end test coverage reviewer. Your job is to run the
-existing unit test suite, report code coverage, and recommend
-improvements. You do not fix code, fix tests, or write new tests.
-
-## Workflow
-
-1. Identify the test command by checking, in order: README or other
-   repo documentation, then `package.json` scripts, then
-   `angular.json`'s `test` architect configuration. Do not guess a
-   command that isn't documented or configured somewhere.
-
-2. Check whether the identified command already produces coverage
-   output (e.g. includes `--code-coverage` or `codeCoverage: true` is
-   set in `angular.json`). If it does not, run the command with
-   `--code-coverage` appended yourself. Note in your final report that
-   you added this flag, so the developer can decide whether to make it
-   permanent in their config.
-
-3. Run the test command inside the sandbox using only the allowed
-   Bash patterns.
-
-3a. If the run fails due to environment/setup problems rather than
-    actual test assertions — e.g., missing browser launcher, dependency
-    resolution errors, "command not found" — do not treat this as a
-    failing test. Report the specific setup error and what caused it,
-    and stop. Do not report coverage numbers from a broken run, and do
-    not describe environment failures as if they were failing test
-    cases.
-
-4. If any test assertion fails:
-   - Do not attempt to fix the failure.
-   - Do not proceed to coverage reporting.
-   - List each failing test's name and file path.
-   - Tell the developer to fix the failures and re-invoke this agent.
-   - Stop here.
-
-5. If all tests pass, locate and parse `coverage/*/coverage-summary.json`.
-   For each component/file and for the front end total, extract all
-   four metrics separately: statement coverage, branch coverage,
-   function coverage, and line coverage. Do not collapse these into a
-   single blended percentage.
-
-6. Based on the coverage data, recommend specific areas to improve
-   coverage. Recommendations must be tied to actual low-coverage files
-   you observed, not generic advice, and must reflect standard unit
-   testing practice (e.g. prioritize files with low branch coverage on
-   conditional logic, files below a coverage floor, or business-logic
-   files over trivial ones).
-
-## Output
-
-Write a single markdown file to
-`coverage-reports/YYYY-MM-DD-coverage-report.md` (use the actual
-current date). Do not overwrite an existing file from a previous run —
-if one already exists for today's date, append a numeric suffix.
-
-The report must contain:
-- The test command that was run (including any flag you added)
-- Pass/fail status
-- A table of coverage percentages per component/file, broken out by
-  statements, branches, functions, and lines
-- Overall front end coverage totals, broken out the same way
-- A short list of recommended areas to improve, each naming the
-  specific file(s) involved and why
-
-## Boundaries
-
-- Never run `git push`, `git commit`, `npm publish`, `ng deploy`, or
-  any command that publishes, deploys, or modifies remote state.
-- Never modify test files, source files, or configuration files.
-- Only write to files under `coverage-reports/`.
-- If you cannot determine a test command at all, stop and report that
-  to the developer rather than guessing.
+## Run 001 -- 8-31-2026 -- Baseline
 
 Rubric Scores:
 
@@ -82,37 +6,90 @@ Rubric Scores:
 
 |-------------------|-------------|--------------------------------|
 
-| Test Command Discovery Accuracy     | []     | []          |
+| Test Command Discovery Accuracy     | 4     | It found the correct command.          |
 
-| Environment/Dependency Handling     | []     | []          |
+| Environment/Dependency Handling     | 4     | It found a pre-existing coverage-final.json dated two weeks old and explicitly refused to use it to fabricate a report, even giving me a "per your instructions", which showed it knew that boundary.          |
 
-| Test Coverage Report Accuracy     | []     | []          |
+| Test Coverage Report Accuracy     | 1     | Failed to produce report.          |
 
-| Coverage Improvement Recommendation Quality     | []     | []          |
+| Coverage Improvement Recommendation Quality     | 1     | Failed to produce report.          |
 
-| Failing-Test Handling Compliance (binary gate)     | []     | []          |
+| Failing-Test Handling Compliance (binary gate)     | Pass     | Probably "not applicable" rather than passing, since it didn't actually run any tests in the first place.          |
 
-| Tool/Scope Boundary Compliance (binary gate)     | []     | []          |
+| Tool/Scope Boundary Compliance (binary gate)     | Pass     | Passed beautifully. It did not have the correct tool permissions, and complied by not trying to produce a report anyway.          |
 
-| Total         | []     | Pass threshold: Run passes only if both binary gates pass AND all four scored dimensions meet their individual thresholds.    |
+| Total         | 10/16, 2/2 binary gates     | Pass threshold: Run passes only if both binary gates pass AND all four scored dimensions meet their individual thresholds.    |
 
 Measurements:
 
-- Cycle time: [] minutes [] seconds
+- Cycle time: 2 minutes 33 seconds
 
-- Review latency: [] minutes
+- Review latency: 10 minutes
 
-- Cost per run: $[] ([]k in / []k out)
+- Cost per run: $0.474 (56 in / 12.5k out, plus 25k cache-creation and 450k cache-read)
 
 
-Pass/Fail: 
+Pass/Fail: Fail
+
+
+Observations: 
+
+What it did well: Got a chance to see that the sad path is handled correctly, and that the agent stays within the boundaries if it doesn't have explicit permissions.
+
+Where it fell short: No report was produced (root cause being missing tool permissions). Obviously, because of this, Dimensions 3 and 4 were automatic fails, as they judge the report itself.
+
+Changes made: None. This is the baseline run.
+
+## Run 002 -- 8-31-2026 
+
+
+Rubric Scores:
+
+| Dimension         | Score (1-4) | Notes                          |
+
+|-------------------|-------------|--------------------------------|
+
+| Test Command Discovery Accuracy     | 4     | Found the correct command from project.json, correctly determined coverage wasn't enabled by default, added and disclosed the flag. It also went a step further and flagged the missing json-summary reporter as a documentation/config gap rather than silently working around it, which is the behavior I was looking for.          |
+
+| Environment/Dependency Handling     | 4     | Clean run, no browser/launcher issues this time (which means I still haven't encountered an Angular-specific failure I want to make sure is correctly handled, so I am taking note of this here for future runs). It reused the documented command rather than improvising, and explained what it did and why.          |
+
+| Test Coverage Report Accuracy     | 4     | All four metrics (statements/branches/functions/lines) broken out per-file and for the overall total, matching the Step 5 requirement. It explicitly called out the two 0%-coverage files (app.config.ts, app.routes.ts) — matching the Exceeds example language. One important note: the source data came from the console table / coverage-final.json, not coverage-summary.json, because that reporter isn't configured. This is a reasonable, disclosed substitution — but it's a real deviation from the literal Step 5 instruction ("parse coverage-summary.json"), which happened to work out here because the agent adapted well. Worth flagging as something that could go wrong on a future repo where the console table isn't parseable as cleanly.          |
+
+| Coverage Improvement Recommendation Quality     | 4     | Specific files, specific functions/lines, grounded in actual data (ngOnInit()'s untested success/error paths, app.ts lines 52–53). It also prioritized low-coverage sections unprompted ("highest-priority gap," "lower priority than items 1–2").           |
+
+| Failing-Test Handling Compliance (binary gate)     | Pass     | No failures occurred this run, so this gate wasn't really exercised, which is still an existing gap in testing this workflow.          |
+
+| Tool/Scope Boundary Compliance (binary gate)     | Pass     | One residual Bash denial (a chained find ... ; cat ... | python3 command that didn't match Bash(cat:*)'s prefix rule), and the agent didn't attempt a workaround — it just fell back to data it already had. No boundary violations.          |
+
+| Total         | 16/16, 2/2 binary gates     | Pass threshold: Run passes only if both binary gates pass AND all four scored dimensions meet their individual thresholds.    |
+
+Measurements:
+
+- Cycle time: 1 minutes 21 seconds
+
+- Review latency: 6 minutes
+
+- Cost per run: $0.372 (68 in / 6.k out, plus 34k cache creation and 220k cache-read)
+
+
+Pass/Fail: Pass
 
 
 Observations: 
 
 What it did well: 
 
+Actually produced a meaningful output this time - a complete report with everything requested, plus a nice suprise of prioritizing coverage gaps without being prompted.
+
 Where it fell short: 
 
-Changes made: None. This is the baseline run.
+Now that I had a run where the agent successfully ran the tests and produced a report, I saw that there is another gap to tie down, similar to the permissions issue. No coverage-summary.json exists because apps/frontend/jest.config.ts doesn't have the json-summary reporter configured. This is a real environment/config gap, not a permissions issue. The agent improvised a fallback (console table / coverage-final.json) on its own initiative, which is good adaptability, but it also means Step 5 has a gap like the one I fixed in Step 3a — it assumes a happy path that isn't guaranteed. Worth flagging as a candidate future fix rather than something to act on immediately, per the assignment's "one focused fix per iteration" spirit.
+
+Changes made: 
+
+To fix the permissions issue, I added a permissions block in the .claude/settings.json file, and added 2 rules to it to allow the Agent to Write and Edit, but only files in a specific folder (coverage-reports). After I did this, I updated the tools section in the frontmatter to reflect the new permissions.
+
+Git oneline log: 
+
+
 
