@@ -40,6 +40,8 @@ Where it fell short: No report was produced (root cause being missing tool permi
 
 Changes made: None. This is the baseline run.
 
+Git log: (After merging fix - ignore "fix proposed") 24580d3 log: run 1 reflection - 10/16 rubric, 1 misfire noted, fix proposed
+
 ## Run 002 -- 8-31-2026 
 
 
@@ -79,7 +81,7 @@ Observations:
 
 What it did well: 
 
-Actually produced a meaningful output this time - a complete report with everything requested, plus a nice suprise of prioritizing coverage gaps without being prompted.
+Actually produced a meaningful output this time - a complete report with everything requested, plus a nice suprise of prioritizing coverage gaps without being prompted. The coverage percentages reported matched what I get when I run the tests in my IDE, and every section was present and clearly labeled.
 
 Where it fell short: 
 
@@ -89,7 +91,8 @@ Changes made:
 
 To fix the permissions issue, I added a permissions block in the .claude/settings.json file, and added 2 rules to it to allow the Agent to Write and Edit, but only files in a specific folder (coverage-reports). After I did this, I updated the tools section in the frontmatter to reflect the new permissions.
 
-Git oneline log: 
+Git log: 
+87a192a (HEAD -> main, origin/main, origin/HEAD) log 2 reflection - 16/16 rubric, no misfires, but improvements proposed
 
 
 
