@@ -1,0 +1,65 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type CsbRequest {
+  callerType: String!
+  city: String!
+  dateCancelled: DateTime
+  dateInvtDone: DateTime
+  dateTimeClosed: DateTime
+  dateTimeInit: DateTime
+  description: String!
+  explanation: String!
+  grandparentId: String!
+  grandparentNode: String!
+  group: String!
+  neighborhood: String!
+  parentId: String!
+  parentNode: String!
+  plainEnglishNameForProblemCode: String!
+  prjCompleteDate: DateTime
+  probAddType: String!
+  probAddress: String!
+  probZip: String!
+  problemCode: String!
+  problemsId: String!
+  publicResolution: String!
+  requestId: String!
+  srx: Float
+  sry: Float
+  status: String!
+  submitTo: String!
+  ward: String!
+}
+
+input CsbRequestSearchInput {
+  dateFrom: String
+  dateTo: String
+  group: String
+  keyword: String
+  month: Int
+  neighborhood: String
+  page: Int
+  pageSize: Int
+  problemCode: String
+  status: String
+  ward: String
+  year: Int
+}
+
+type CsbRequestSearchResult {
+  data: [CsbRequest!]!
+  page: Int!
+  pageSize: Int!
+  total: Int!
+}
+
+"""
+A date/time value. Serializes to ISO 8601 when the underlying value is parseable; otherwise passes the original raw string through unchanged (source data is not guaranteed to be in a consistent format).
+"""
+scalar DateTime
+
+type Query {
+  csbRequests(input: CsbRequestSearchInput): CsbRequestSearchResult!
+}
