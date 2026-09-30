@@ -3,6 +3,7 @@
 **Date:** 09-07-2026
 **Review by:** 12-26-2026
 **Status:** Active
+**Owner:** Erica Knaup
 
 **Decision:** It was decided to retype 5 nullable date fields as a custom `DateTime` GraphQL scalar. These were previously typed as plain `String`. The affected fields are on `CsbRequestType`: `dateCancelled`, `dateInvtDone`, `dateTimeClosed`, `dateTimeInit`, and `prjCompleteDate`.
 

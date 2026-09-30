@@ -1,6 +1,6 @@
 # Project Memory Index
 
-Last updated: 2026-09-27
+Last updated: 2026-09-29
 
 ## Active entries
 
@@ -23,3 +23,9 @@ Last updated: 2026-09-27
 - Workflow-scoped entries: archived when the branch
  merges to main
 - Project-scoped entries: reviewed every 90 days
+
+## Ownership
+
+- Every decision entry must record an `Owner` — the
+ developer accountable for the decision, to be
+ consulted before it is reversed or superseded.
