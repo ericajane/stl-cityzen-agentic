@@ -10,7 +10,6 @@ should never modify this file.
 
 - Variable Naming: Use descriptive variable names in camelCase.
 - Function Naming: Use descriptive function names in camelCase.
-- Code Formatting: Follow the project's code formatting guidelines.
 - No hardcoded file paths — all paths come from configuration.
 - Every file that modifies data must log what it changed and when.
 - Error messages must be descriptive and include context.
