@@ -1,6 +1,6 @@
 # Project Memory Index
 
-Last updated: 2026-09-29
+Last updated: 2026-10-06
 
 ## Active entries
 
@@ -9,6 +9,12 @@ Last updated: 2026-09-29
 
 - `decisions/decision-002.md` — Records the decision to organize test files in a separate `/tests` directory rather than alongside source files. Recorded 2026-09-27.
  Review by 12-26-2026.
+
+- `decisions/decision-003.md` — Records the decision to use Leaflet (canvas-rendered `circleMarker`, no default marker PNGs) as the map view library. Recorded 2026-10-06.
+ Review by 2027-01-04.
+
+- `decisions/decision-004.md` — Records the decision to use public-domain USGS National Map basemap tiles (URL from config) for the map view instead of OpenStreetMap. Recorded 2026-10-06.
+ Review by 2027-01-04.
 
 - `../knowledge/coding-standards.md` — Coding standards
  for this project. Human-maintained, read-only.
