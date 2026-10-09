@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-27
 **Review by:** 2026-12-26
-**Status:** Active
+**Status:** Superseded by decision-007
 **Owner:** Erica Knaup
 
 **Decision:** Test files will be organized in a separate `/tests` directory rather than being colocated alongside their corresponding source files.

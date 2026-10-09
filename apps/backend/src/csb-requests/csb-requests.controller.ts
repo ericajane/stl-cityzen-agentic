@@ -73,6 +73,32 @@ export class CsbRequestsController {
   }
 
   /**
+   * GET /api/csb-requests/map-points
+   * Returns request locations as WGS84 lat/lng points for the map view,
+   * with optional filters. Rows with unrecoverable coordinates are excluded.
+   */
+  @Get('map-points')
+  getMapPoints(
+    @Query('neighborhood') neighborhood?: string,
+    @Query('ward') ward?: string,
+    @Query('status') status?: string,
+    @Query('group') group?: string,
+    @Query('problemCode') problemCode?: string,
+    @Query('year', new DefaultValuePipe(0), ParseIntPipe) yearRaw = 0,
+    @Query('month', new DefaultValuePipe(0), ParseIntPipe) monthRaw = 0,
+  ) {
+    return this.csbRequestsService.getMapPoints({
+      neighborhood,
+      ward,
+      status,
+      group,
+      problemCode,
+      year: yearRaw || undefined,
+      month: monthRaw || undefined,
+    });
+  }
+
+  /**
    * GET /api/csb-requests/stats/by-group
    * Returns request counts grouped by problem group, with optional filters.
    */
