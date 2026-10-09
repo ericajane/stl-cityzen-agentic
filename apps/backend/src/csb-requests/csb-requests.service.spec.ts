@@ -1,7 +1,7 @@
 import Database from 'better-sqlite3';
 import { Test } from '@nestjs/testing';
 import { DATABASE_TOKEN } from '../database/database.module';
-import { CsbRequestsService } from './csb-requests.service';
+import { CsbRequestsService, repairMercatorPoint } from './csb-requests.service';
 import { NeighborhoodLookupService } from '../neighborhoods/neighborhood-lookup.service';
 
 function makeDb(): Database.Database {
@@ -469,6 +469,89 @@ describe('CsbRequestsService', () => {
       insertRow(db, { request_id: 'r2', neighborhood: null, srx: -10040000, sry: 4670000 });
 
       expect(svc.backfillNeighborhoods()).toBe(2);
+    });
+  });
+
+  describe('repairMercatorPoint', () => {
+    it('passes through valid (negative srx) coordinates unchanged', () => {
+      expect(repairMercatorPoint(-10046885, 4666741)).toEqual({ x: -10046885, y: 4666741 });
+    });
+
+    it('flips the sign of a positive (sign-flipped) srx', () => {
+      expect(repairMercatorPoint(10046885, 4666741)).toEqual({ x: -10046885, y: 4666741 });
+    });
+
+    it('treats true 0/0 as unrecoverable junk and returns null', () => {
+      expect(repairMercatorPoint(0, 0)).toBeNull();
+    });
+
+    it('returns null when either coordinate is null', () => {
+      expect(repairMercatorPoint(null, null)).toBeNull();
+      expect(repairMercatorPoint(null, 4666741)).toBeNull();
+      expect(repairMercatorPoint(-10046885, null)).toBeNull();
+    });
+  });
+
+  describe('getMapPoints', () => {
+    it('converts valid srx/sry to a sane St. Louis-area lat/lng', () => {
+      insertRow(db, { request_id: 'r1', srx: -10046885, sry: 4666741 });
+
+      const [point] = service.getMapPoints({});
+      expect(point.requestId).toBe('r1');
+      // St. Louis is roughly lat 38.6, lng -90.2
+      expect(point.lat).toBeGreaterThan(38);
+      expect(point.lat).toBeLessThan(39);
+      expect(point.lng).toBeGreaterThan(-91);
+      expect(point.lng).toBeLessThan(-90);
+    });
+
+    it('repairs a sign-flipped srx before converting', () => {
+      insertRow(db, { request_id: 'r1', srx: 10046885, sry: 4666741 });
+
+      const [point] = service.getMapPoints({});
+      expect(point.lng).toBeGreaterThan(-91);
+      expect(point.lng).toBeLessThan(-90);
+    });
+
+    it('excludes rows with true 0/0 coordinates', () => {
+      insertRow(db, { request_id: 'r1', srx: 0, sry: 0 });
+
+      expect(service.getMapPoints({})).toEqual([]);
+    });
+
+    it('excludes rows with null srx/sry', () => {
+      insertRow(db, { request_id: 'r1', srx: null, sry: null });
+
+      expect(service.getMapPoints({})).toEqual([]);
+    });
+
+    it('filters by neighborhood', () => {
+      insertRow(db, { request_id: 'r1', neighborhood: '27', srx: -10046885, sry: 4666741 });
+      insertRow(db, { request_id: 'r2', neighborhood: '15', srx: -10040000, sry: 4670000 });
+
+      const result = service.getMapPoints({ neighborhood: '27' });
+      expect(result).toHaveLength(1);
+      expect(result[0].requestId).toBe('r1');
+    });
+
+    it('includes the other map-relevant fields', () => {
+      insertRow(db, {
+        request_id: 'r1',
+        srx: -10046885,
+        sry: 4666741,
+        ward: '6',
+        plain_english_name: 'Pothole',
+        prob_address: '100 Main St',
+        status: 'OPEN',
+        date_time_init: '2025-03-01T10:00:00.000Z',
+      });
+
+      const [point] = service.getMapPoints({});
+      expect(point.ward).toBe('6');
+      expect(point.problemName).toBe('Pothole');
+      expect(point.address).toBe('100 Main St');
+      expect(point.status).toBe('OPEN');
+      expect(point.dateTimeInit).toBe('2025-03-01T10:00:00.000Z');
     });
   });
 });

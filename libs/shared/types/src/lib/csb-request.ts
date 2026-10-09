@@ -72,3 +72,15 @@ export interface CsbFilterOptions {
   problemCodes: string[];
   years: number[];
 }
+
+export interface MapPoint {
+  requestId: string;
+  lat: number;
+  lng: number;
+  neighborhood: string | null;
+  ward: string | null;
+  problemName: string | null;
+  address: string | null;
+  status: string | null;
+  dateTimeInit: string | null;
+}

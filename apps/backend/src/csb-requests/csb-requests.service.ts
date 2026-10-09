@@ -1,5 +1,6 @@
 import { Injectable, Inject, Logger, OnModuleInit } from '@nestjs/common';
 import Database from 'better-sqlite3';
+import proj4 from 'proj4';
 import { DATABASE_TOKEN } from '../database/database.module';
 import { NeighborhoodLookupService } from '../neighborhoods/neighborhood-lookup.service';
 import type {
@@ -9,7 +10,34 @@ import type {
   CsbFilterOptions,
   MonthlyCount,
   GroupCount,
+  MapPoint,
 } from '@org/types';
+
+// Web Mercator — matches srx/sry in the database (see neighborhood-lookup.service.ts).
+const WEB_MERCATOR =
+  '+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 ' +
+  '+x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs';
+const WGS84 = '+proj=longlat +datum=WGS84 +no_defs';
+const toWgs84 = proj4(WEB_MERCATOR, WGS84);
+
+/**
+ * Repairs known data-quality issues in raw srx/sry (Web Mercator) coordinates
+ * before conversion:
+ * - null/null (no coordinates captured): passed through as null.
+ * - 0/0 (true junk, not a real location): treated as unrecoverable, returns null.
+ * - positive srx (sign-flipped — St. Louis srx is always negative/west of the
+ *   prime meridian): sign is flipped back to repair the value.
+ * - otherwise: returned unchanged.
+ */
+export function repairMercatorPoint(
+  srx: number | null,
+  sry: number | null,
+): { x: number; y: number } | null {
+  if (srx === null || sry === null) return null;
+  if (srx === 0 && sry === 0) return null;
+  if (srx > 0) return { x: -srx, y: sry };
+  return { x: srx, y: sry };
+}
 
 /**
  * Normalizes a raw neighborhood string to a zero-padded 2-digit code (e.g. "01", "27"),
@@ -271,6 +299,64 @@ export class CsbRequestsService implements OnModuleInit {
       `Neighborhood backfill: ${updated} of ${rows.length} records updated`,
     );
     return updated;
+  }
+
+  /**
+   * Returns request locations as WGS84 lat/lng points for the map view.
+   * Rows with unrecoverable coordinates (null/null or true 0/0) are excluded.
+   * Sign-flipped srx values are repaired before conversion (see repairMercatorPoint).
+   */
+  getMapPoints(params: {
+    neighborhood?: string;
+    ward?: string;
+    status?: string;
+    group?: string;
+    problemCode?: string;
+    year?: number;
+    month?: number;
+  }): MapPoint[] {
+    const { neighborhood, ward, status, group, problemCode, year, month } = params;
+
+    const conditions: string[] = ['srx IS NOT NULL AND sry IS NOT NULL'];
+    const bindings: unknown[] = [];
+
+    if (neighborhood) { conditions.push('neighborhood = ?'); bindings.push(neighborhood); }
+    if (ward)         { conditions.push('ward = ?');         bindings.push(ward); }
+    if (status)       { conditions.push('status = ?');       bindings.push(status); }
+    if (group)        { conditions.push('group_name = ?');   bindings.push(group); }
+    if (problemCode)  { conditions.push('problem_code = ?'); bindings.push(problemCode); }
+    if (year)         { conditions.push("CAST(strftime('%Y', date_time_init) AS INTEGER) = ?"); bindings.push(year); }
+    if (month)        { conditions.push("CAST(strftime('%m', date_time_init) AS INTEGER) = ?"); bindings.push(month); }
+
+    const rows = this.db
+      .prepare(
+        `SELECT request_id, srx, sry, neighborhood, ward, plain_english_name,
+                prob_address, status, date_time_init
+         FROM csb_requests
+         WHERE ${conditions.join(' AND ')}`,
+      )
+      .all(...bindings) as Record<string, unknown>[];
+
+    const points: MapPoint[] = [];
+    for (const row of rows) {
+      const repaired = repairMercatorPoint(row['srx'] as number, row['sry'] as number);
+      if (!repaired) continue;
+
+      const [lng, lat] = toWgs84.forward([repaired.x, repaired.y]);
+      points.push({
+        requestId: row['request_id'] as string,
+        lat,
+        lng,
+        neighborhood: (row['neighborhood'] as string) || null,
+        ward: (row['ward'] as string) || null,
+        problemName: (row['plain_english_name'] as string) || null,
+        address: (row['prob_address'] as string) || null,
+        status: (row['status'] as string) || null,
+        dateTimeInit: (row['date_time_init'] as string) || null,
+      });
+    }
+
+    return points;
   }
 
   getGroupStats(neighborhood?: string, year?: number, month?: number): GroupCount[] {
