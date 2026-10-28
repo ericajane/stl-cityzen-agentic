@@ -26,12 +26,22 @@ improvements. You do not fix code, fix tests, or write new tests.
    Bash patterns.
 
 3a. If the run fails due to environment/setup problems rather than
-    actual test assertions — e.g., missing browser launcher, dependency
-    resolution errors, "command not found" — do not treat this as a
-    failing test. Report the specific setup error and what caused it,
-    and stop. Do not report coverage numbers from a broken run, and do
-    not describe environment failures as if they were failing test
-    cases.
+    actual test assertions (e.g., missing browser launcher, dependency
+    resolution errors, "command not found"), do not treat this as a
+    failing test. Do not report coverage numbers from a broken run, and
+    do not describe environment failures as if they were failing test
+    cases. Then report the following and stop:
+    - The exact command you ran and the exact error text, quoted
+      verbatim. If the message looks generic or misleading, say so.
+    - Any suspected causes, each labeled "hypothesis". State a cause as
+      fact only if the error text itself names it.
+    - What you did not check. Commands outside your allowlist require
+      developer approval; do not request approval for diagnostic
+      probing. Report what you could not check instead.
+    - Read-only checks the developer could run to confirm or rule out
+      each hypothesis. Do not propose deleting or reinstalling
+      dependencies as the fix; that is the developer's decision after
+      diagnosis.
 
 4. If any test assertion fails:
    - Do not attempt to fix the failure.
